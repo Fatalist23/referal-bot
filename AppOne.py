@@ -1,7 +1,11 @@
 from telegram.ext import CommandHandler, MessageHandler, Filters, Updater
 import mysql.connector
-updater = Updater(token='546132218:AAGvBSF7dI0QTxKLvwLFlKD0aaFXYBp2_Nc')
-dispatcher = updater.dispatcher
+import telebot
+from telebot import types
+#Telega
+TOKEN = '546132218:AAGvBSF7dI0QTxKLvwLFlKD0aaFXYBp2_Nc'
+bot= telebot.TeleBot(TOKEN)
+#БД
 dbconfig = { 'host': '127.0.0.1',
              'user': 'seregatest',
              'password': 'seregatestpass',
@@ -9,8 +13,17 @@ dbconfig = { 'host': '127.0.0.1',
 
 conn = mysql.connector.connect(**dbconfig)
 cursor = conn.cursor(buffered=True)
+#Клавиатура
+MainMarkup = types.ReplyKeyboardMarkup(resize_keyboard=True,row_width=1)
+MainBtn = types.KeyboardButton("Нажми на кнопку")
+MainMarkup.add(MainBtn)
 
-#hello Friday
+def isint(s):
+    try:
+        int(s)
+        return True
+    except ValueError:
+        return False
 def searchuser (usID):
     userCounter = -1
     cursor.execute("SELECT refCount FROM users WHERE userID =" + str(usID))
@@ -37,28 +50,33 @@ def adduserref (usID, refID):
     cursor.execute("INSERT INTO users VALUES (%s,%s,%s)", (usID, 0, 1))
 
 
-
-def start(bot, update):
-    bot.send_message(chat_id=update.message.chat_id, text="Ваш уникальный номер для приглашений:")
-    got_id = update.message.chat_id
-    bot.send_message(chat_id=update.message.chat_id, text=got_id)
-    adduser(got_id)
-    ifrefed(got_id)
-    searchuser(got_id)
-
-
-def echo(bot, update):
-    bot.send_message(chat_id=update.message.chat_id, text=update.message.text)
-
-
-start_handler = CommandHandler('start', start)
-dispatcher.add_handler(start_handler)
-echo_handler = MessageHandler(Filters.text, echo)
-dispatcher.add_handler(echo_handler)
+@bot.message_handler(commands=['start'])
+def start(message):
+    bot.send_message ( message.chat.id , text='Подписаться на уведомления' , reply_markup=MainMarkup )
+    Refer_ID = message.text[6:]
+    User_ID= message.chat.id
+    for s in Refer_ID:
+        if isint(s)==False:
+            letter = True
+        else:
+            letter = False
+    if letter == False:
+        adduser(User_ID,Refer_ID)
+    else:
+        adduser(User_ID,0)
 
 
 
-checknum = 8981759
+
+
+
+bot.polling(none_stop=True)
+
+
+
+
+
+
 #searchuser(checknum)
 
 
@@ -67,4 +85,4 @@ for row in res:
     print(row)
 cursor.close()"""
 
-updater.start_polling()
+
