@@ -18,6 +18,8 @@ MainMarkup = types.ReplyKeyboardMarkup(resize_keyboard=True,row_width=1)
 MainBtn = types.KeyboardButton("Нажми на кнопку")
 MainMarkup.add(MainBtn)
 
+
+#another commit
 def isint(s):
     try:
         int(s)
