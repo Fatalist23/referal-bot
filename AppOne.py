@@ -10,7 +10,7 @@ dbconfig = { 'host': '127.0.0.1',
 conn = mysql.connector.connect(**dbconfig)
 cursor = conn.cursor(buffered=True)
 
-
+#hello Friday
 def searchuser (usID):
     userCounter = -1
     cursor.execute("SELECT refCount FROM users WHERE userID =" + str(usID))
