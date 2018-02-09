@@ -25,11 +25,13 @@ def isint(s):
     except ValueError:
         return False
 def searchuser (usID):
-    userCounter = -1
+    usercounter = -1
     cursor.execute("SELECT refCount FROM users WHERE userID =" + str(usID))
     res = cursor.fetchall()
-    userCounter = res[0][0]
-    return userCounter
+    if (res != []):
+        usercounter = res[0][0]
+    return usercounter
+
 
 def ifrefed (usID):
     wasrefed = False
@@ -40,14 +42,43 @@ def ifrefed (usID):
     return wasrefed
 
 
-def adduser (usID):
-    cursor.execute("INSERT INTO users VALUES (%s,%s,%s)", (usID, 0, 0))
-    conn.commit()
-
-
-def adduserref (usID, refID):
-
-    cursor.execute("INSERT INTO users VALUES (%s,%s,%s)", (usID, 0, 1))
+def adduser (usID, refID):
+    uscounter = searchuser(usID)
+    refcounter = searchuser(refID)
+    if (refID == 0):
+        if (uscounter==-1):
+            cursor.execute("INSERT INTO users VALUES (%s,%s,%s)", (usID, 0, 0))
+            conn.commit()
+            return (uscounter)
+        else:
+            return (uscounter)
+    else:
+        if (refcounter == -1):
+            if (uscounter == -1):
+                cursor.execute("INSERT INTO users VALUES (%s,%s,%s)", (usID, 0, 0))
+                conn.commit()
+                return (uscounter)
+            else:
+                return (uscounter)
+        else:
+            if (uscounter == -1):
+                if (ifrefed(usID)==False):
+                    refcounter = refcounter +1
+                    cursor.execute("UPDATE `users` SET refCounter=" + str(refcounter) + " WHERE `usserID` =" + str(usID))
+                    cursor.execute("INSERT INTO users VALUES (%s,%s,%s)", (usID, 0, 1))
+                    conn.commit()
+                    return uscounter
+                else:
+                    cursor.execute("INSERT INTO users VALUES (%s,%s,%s)", (usID, 0, 1))
+                    conn.commit()
+                    return uscounter
+            else:
+                if (ifrefed(usID)==False):
+                    refcounter = refcounter +1
+                    cursor.execute("UPDATE `users` SET refCounter=" + str(refcounter) + " WHERE `usserID` =" + str(usID))
+                    return uscounter
+                else:
+                    return uscounter
 
 
 @bot.message_handler(commands=['start'])
@@ -66,23 +97,4 @@ def start(message):
         adduser(User_ID,0)
 
 
-
-
-
-
 bot.polling(none_stop=True)
-
-
-
-
-
-
-#searchuser(checknum)
-
-
-"""res = cursor.fetchall()
-for row in res:
-    print(row)
-cursor.close()"""
-
-
