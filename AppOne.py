@@ -4,6 +4,7 @@ updater = Updater(token='546132218:AAGvBSF7dI0QTxKLvwLFlKD0aaFXYBp2_Nc')
 dispatcher = updater.dispatcher
 
 # hello world twice
+#hello world third
 def searchUser (usID):
     result = -1
     cursor.execute("SELECT counter FROM log WHERE id = (%s)",(usID))
