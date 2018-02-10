@@ -15,17 +15,12 @@ conn = mysql.connector.connect(**dbconfig)
 cursor = conn.cursor(buffered=True)
 #Клавиатура
 MainMarkup = types.ReplyKeyboardMarkup(resize_keyboard=True,row_width=1)
-MainBtn = types.KeyboardButton("Нажми на кнопку")
+MainBtn = types.KeyboardButton("Ты")
 MainMarkup.add(MainBtn)
+MainBtn1 = types.KeyboardButton("Пидор")
+MainMarkup.add(MainBtn1)
 
 
-#another commit
-def isint(s):
-    try:
-        int(s)
-        return True
-    except ValueError:
-        return False
 def searchuser (usID):
     usercounter = -1
     cursor.execute("SELECT refCount FROM users WHERE userID =" + str(usID))
@@ -39,8 +34,9 @@ def ifrefed (usID):
     wasrefed = False
     cursor.execute("SELECT ifInv FROM users WHERE userID =" + str(usID))
     res = cursor.fetchall()
-    if ((res[0][0])==1):
-        wasrefed = True
+    if (res!=[]):
+        if ((res[0][0])==1):
+            wasrefed = True
     return wasrefed
 
 
@@ -51,52 +47,97 @@ def adduser (usID, refID):
         if (uscounter==-1):
             cursor.execute("INSERT INTO users VALUES (%s,%s,%s)", (usID, 0, 0))
             conn.commit()
+            uscounter = 0
+            print("tut4")
             return (uscounter)
         else:
+            print("tut8")
             return (uscounter)
     else:
         if (refcounter == -1):
             if (uscounter == -1):
                 cursor.execute("INSERT INTO users VALUES (%s,%s,%s)", (usID, 0, 0))
                 conn.commit()
+                uscounter = 0
+                print("tut3")
                 return (uscounter)
             else:
+                print("tut7")
                 return (uscounter)
         else:
             if (uscounter == -1):
                 if (ifrefed(usID)==False):
-                    refcounter = refcounter +1
-                    cursor.execute("UPDATE `users` SET refCounter=" + str(refcounter) + " WHERE `usserID` =" + str(usID))
-                    cursor.execute("INSERT INTO users VALUES (%s,%s,%s)", (usID, 0, 1))
-                    conn.commit()
-                    return uscounter
+                    if (usID == refID):
+                        cursor.execute("INSERT INTO users VALUES (%s,%s,%s)", (usID, 0, 0))
+                        conn.commit()
+                        uscounter = 0
+                        print("tut2")
+                        return (uscounter)
+                    else:
+                        refcounter = refcounter +1
+                        cursor.execute("UPDATE `users` SET refCount=" + str(refcounter) + " WHERE `userID` =" + str(usID))
+                        conn.commit()
+                        cursor.execute("INSERT INTO users VALUES (%s,%s,%s)", (usID, 0, 1))
+                        conn.commit()
+                        uscounter = 0
+                        print("tut1")
+                        return uscounter
                 else:
                     cursor.execute("INSERT INTO users VALUES (%s,%s,%s)", (usID, 0, 1))
                     conn.commit()
+                    print("tut")
                     return uscounter
             else:
                 if (ifrefed(usID)==False):
-                    refcounter = refcounter +1
-                    cursor.execute("UPDATE `users` SET refCounter=" + str(refcounter) + " WHERE `usserID` =" + str(usID))
-                    return uscounter
+                    if (usID == refID):
+                        print("tut11")
+                        return uscounter
+                    else:
+                        refcounter = refcounter +1
+                        cursor.execute("UPDATE `users` SET refCount=" + str(refcounter) + " WHERE `userID` =" + str(refID))
+                        conn.commit()
+                        cursor.execute("UPDATE `users` SET ifInv=1"+ " WHERE `userID` =" + str(usID))
+                        conn.commit()
+                        return uscounter
                 else:
+                    print("tut5")
                     return uscounter
 
 
 @bot.message_handler(commands=['start'])
 def start(message):
-    bot.send_message ( message.chat.id , text='Подписаться на уведомления' , reply_markup=MainMarkup )
     Refer_ID = message.text[6:]
     User_ID= message.chat.id
+    print (Refer_ID)
+    print (User_ID)
+
+    found = False
+    tryout = 0
+    i = 0
     for s in Refer_ID:
-        if isint(s)==False:
-            letter = True
-        else:
-            letter = False
-    if letter == False:
-        adduser(User_ID,Refer_ID)
+        tryout = 1
+        if s.isdigit()==False:
+            found = True
+        if i ==0:
+            i = i + 1
+            found = False
+        if (found==True):
+            print(s)
+            print(type(s))
+            print (s.isdigit())
+
+    if tryout==0:
+        a = adduser(User_ID, 0)
     else:
-        adduser(User_ID,0)
+        if found==True:
+            print("tutachki")
+            a = adduser(User_ID, 0)
+        else:
+            Refer_ID=Refer_ID[1:]
+            print("tutkeckii")
+            a =adduser(User_ID, Refer_ID)
+
+    bot.send_message(message.chat.id, text='Вы пригласили: '+str(a)+' человек\nВаша ссылка для приглашения: t.me/CheckPythoBot?start='+ str(User_ID), reply_markup=MainMarkup)
 
 
 bot.polling(none_stop=True)
