@@ -15,9 +15,9 @@ conn = mysql.connector.connect(**dbconfig)
 cursor = conn.cursor(buffered=True)
 #Клавиатура
 MainMarkup = types.ReplyKeyboardMarkup(resize_keyboard=True,row_width=1)
-MainBtn = types.KeyboardButton("Ты")
+MainBtn = types.KeyboardButton("Button1")
 MainMarkup.add(MainBtn)
-MainBtn1 = types.KeyboardButton("Пидор")
+MainBtn1 = types.KeyboardButton("Button2")
 MainMarkup.add(MainBtn1)
 
 
