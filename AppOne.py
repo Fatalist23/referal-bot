@@ -6,7 +6,7 @@ from telebot import types
 TOKEN = '546132218:AAGvBSF7dI0QTxKLvwLFlKD0aaFXYBp2_Nc'
 bot= telebot.TeleBot(TOKEN)
 #БД
-dbconfig = { 'host': '127.0.0.1',
+dbconfig = { 'host': 'tcp:72gang.database.windows.net,1433',
              'user': 'seregatest',
              'password': 'seregatestpass',
              'database': 'testbase', }
@@ -15,9 +15,9 @@ conn = mysql.connector.connect(**dbconfig)
 cursor = conn.cursor(buffered=True)
 #Клавиатура
 MainMarkup = types.ReplyKeyboardMarkup(resize_keyboard=True,row_width=1)
-MainBtn = types.KeyboardButton("Button1")
+MainBtn = types.KeyboardButton("Ты")
 MainMarkup.add(MainBtn)
-MainBtn1 = types.KeyboardButton("Button2")
+MainBtn1 = types.KeyboardButton("Пидор")
 MainMarkup.add(MainBtn1)
 
 
@@ -48,10 +48,8 @@ def adduser (usID, refID):
             cursor.execute("INSERT INTO users VALUES (%s,%s,%s)", (usID, 0, 0))
             conn.commit()
             uscounter = 0
-            print("tut4")
             return (uscounter)
         else:
-            print("tut8")
             return (uscounter)
     else:
         if (refcounter == -1):
@@ -59,10 +57,8 @@ def adduser (usID, refID):
                 cursor.execute("INSERT INTO users VALUES (%s,%s,%s)", (usID, 0, 0))
                 conn.commit()
                 uscounter = 0
-                print("tut3")
                 return (uscounter)
             else:
-                print("tut7")
                 return (uscounter)
         else:
             if (uscounter == -1):
@@ -71,7 +67,6 @@ def adduser (usID, refID):
                         cursor.execute("INSERT INTO users VALUES (%s,%s,%s)", (usID, 0, 0))
                         conn.commit()
                         uscounter = 0
-                        print("tut2")
                         return (uscounter)
                     else:
                         refcounter = refcounter +1
@@ -80,17 +75,14 @@ def adduser (usID, refID):
                         cursor.execute("INSERT INTO users VALUES (%s,%s,%s)", (usID, 0, 1))
                         conn.commit()
                         uscounter = 0
-                        print("tut1")
                         return uscounter
                 else:
                     cursor.execute("INSERT INTO users VALUES (%s,%s,%s)", (usID, 0, 1))
                     conn.commit()
-                    print("tut")
                     return uscounter
             else:
                 if (ifrefed(usID)==False):
                     if (usID == refID):
-                        print("tut11")
                         return uscounter
                     else:
                         refcounter = refcounter +1
@@ -100,9 +92,8 @@ def adduser (usID, refID):
                         conn.commit()
                         return uscounter
                 else:
-                    print("tut5")
                     return uscounter
-
+    #return(counter)
 
 @bot.message_handler(commands=['start'])
 def start(message):
